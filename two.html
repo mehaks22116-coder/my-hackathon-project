@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventGuard | Premium Event & Security</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- External Libraries (QR Scanning and Generation) -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        /* ==========================================================================
+           CSS VARIABLES (Design System)
+           ========================================================================== */
+        :root {
+            --bg-main: #090b0a;
+            --bg-card: #111513;
+            --border: rgba(255, 255, 255, 0.14);
+            --accent: #24e58b;
+            --accent-hover: #62f3ad;
+            --accent-soft: rgba(36, 229, 139, 0.12);
+            --zest: #24e58b;
+            --text-main: #f1f4f2;
+            --text-muted: #9ba7a1;
+            --success: #24e58b;
+            --warning: #c8c8c8;
+            --danger: #f0f0f0;
+        }
+
+        /* ==========================================================================
+           GLOBAL RESET & TYPOGRAPHY
+           ========================================================================== */
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Inter', 'Segoe UI', sans-serif; 
+        }
+
+        body {
+            background: var(--bg-main);
+            color: var(--text-main);
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            background-image: 
+                radial-gradient(circle at 82% 12%, rgba(36, 229, 139, 0.11), transparent 24%), 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.035), transparent 36%);
+        }
+        
+        /* Premium Background Glow & Texture Overlay */
+        body::before {
+            content: ''; 
+            position: absolute; 
+            top: -20%; 
+            left: -10%; 
+            width: 50%; 
+            height: 50%;
+            background: linear-gradient(120deg, rgba(36, 229, 139, 0.15), transparent 55%);
+            z-index: -1; 
+            pointer-events: none;
+        }
+
+        body::after {
+            content: ''; 
+            position: fixed; 
+            inset: 0; 
+            pointer-events: none; 
+            z-index: -1; 
+            opacity: 0.22;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px), 
+                linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px);
+            background-size: 42px 42px;
+            mask-image: linear-gradient(to bottom, black, transparent 78%);
+        }
+
+        /* ==========================================================================
+           SIDEBAR NAVIGATION
+           ========================================================================== */
+        .sidebar {
+            width: 280px; 
+            background: #0d100f; 
+            color: var(--text-main); 
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border); 
+            padding: 2rem; 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        .logo { 
+            font-size: 1.5rem; 
+            font-weight: 800; 
+            letter-spacing: 1px; 
+            margin-bottom: 3rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 0.55rem; 
+        }
+
+        .logo::before { 
+            content: ''; 
+            width: 10px; 
+            height: 10px; 
+            background: var(--zest); 
+            border-radius: 50%; 
+            box-shadow: 0 0 16px rgba(36, 229, 139, 0.8); 
+        }
+
+        .logo span { 
+            color: var(--zest); 
+        }
+
+        .nav-btn {
+            background: transparent; 
+            border: 1px solid transparent; 
+            color: var(--text-muted);
+            padding: 1rem; 
+            border-radius: 12px; 
+            text-align: left; 
+            font-size: 1rem; 
+            cursor: pointer;
+            transition: all 0.3s ease; 
+            margin-bottom: 0.5rem; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px;
+        }
+
+        .nav-btn b { 
+            color: var(--accent); 
+            font-size: 1.1rem; 
+            line-height: 1; 
+        }
+
+        .nav-btn:hover { 
+            background: rgba(255,255,255,0.06); 
+            color: var(--text-main); 
+            transform: translateX(3px); 
+        }
+
+        .nav-btn.active { 
+            background: rgba(215, 239, 98, 0.16); 
+            color: var(--zest); 
+            border-color: rgba(215, 239, 98, 0.38); 
+            box-shadow: inset 3px 0 var(--zest); 
+        }
+
+        .sidebar-note { 
+            margin-top: auto; 
+            padding-top: 1.5rem; 
+            border-top: 1px solid var(--border); 
+            color: #737c76; 
+            font-size: 0.7rem; 
+            line-height: 1.6; 
+            letter-spacing: 0.08em; 
+            text-transform: uppercase; 
+        }
+
+        .sidebar-note strong { 
+            display: block; 
+            color: var(--accent); 
+            margin-bottom: 0.2rem; 
+        }
+
+        /* ==========================================================================
+           MAIN CONTENT AREA
+           ========================================================================== */
+        .main-content { 
+            flex: 1; 
+            padding: 3rem 4rem; 
+            overflow-y: auto; 
+            position: relative; 
+        }
+
+        /* Top accent bar */
+        .main-content::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 4rem; 
+            right: 4rem; 
+            height: 3px; 
+            background: var(--accent); 
+            opacity: 0.9; 
+        }
+
+        .view { 
+            display: none; 
+            animation: fadeUp 0.4s ease-out forwards; 
+        }
+
+        .view.active { 
+            display: block; 
+        }
+
+        @keyframes fadeUp { 
+            from { opacity: 0; transform: translateY(15px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+
+        /* Section Headers */
+        .header h1 { 
+            font-size: clamp(2.5rem, 5vw, 5.2rem); 
+            line-height: 0.94; 
+            margin-bottom: 1rem; 
+            font-weight: 900; 
+            letter-spacing: -0.06em; 
+            max-width: 760px; 
+            color: var(--text-main); 
+        }
+
+        .header p { 
+            color: var(--text-muted); 
+            font-size: 1.1rem; 
+            margin-bottom: 2.5rem; 
+        }
+
+        /* ==========================================================================
+           UI COMPONENTS (Cards, Forms, Buttons, etc.)
+           ========================================================================== */
+        
+        /* Glassmorphism Cards */
+        .card {
+            background: var(--bg-card); 
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border); 
+            border-radius: 16px; 
+            padding: 2rem;
+            box-shadow: 0 24px 60px -32px rgba(0,0,0,0.95), inset 0 1px rgba(255,255,255,0.07);
+            transition: border-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .card:hover { 
+            border-color: rgba(36, 229, 139, 0.42); 
+            transform: translateY(-2px); 
+        }
+
+        /* Inputs */
+        input {
+            width: 100%; 
+            background: #f1f4f2; 
+            border: 1px solid transparent;
+            padding: 1rem 1.5rem; 
+            border-radius: 8px; 
+            color: #090b0a; 
+            font-size: 1rem;
+            transition: border 0.3s; 
+            margin-bottom: 1rem;
+        }
+
+        input:focus { 
+            outline: none; 
+            border-color: var(--accent); 
+            box-shadow: 0 0 0 3px var(--accent-soft); 
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--accent); 
+            color: #06140d; 
+            border: none; 
+            padding: 1rem 2rem;
+            border-radius: 12px; 
+            font-weight: 800; 
+            cursor: pointer; 
+            transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn:hover { 
+            background: var(--accent-hover); 
+            transform: translateY(-2px); 
+            box-shadow: 0 10px 24px rgba(36, 229, 139, 0.2); 
+        }
+
+        .btn:active { 
+            transform: translateY(0); 
+        }
+
+        /* Security Status Banners */
+        .status-banner { 
+            border-left: 4px solid var(--success); 
+            margin-bottom: 1.5rem; 
+        }
+
+        .status-danger { 
+            border-left-color: var(--danger); 
+        }
+        
+        /* QR Ticket Styling */
+        .ticket-wrapper { 
+            display: flex; 
+            justify-content: center; 
+            margin-top: 2rem; 
+        }
+
+        .digital-ticket {
+            background: linear-gradient(145deg, #202522, #0c0f0d 70%);
+            border: 1px solid rgba(36, 229, 139, 0.5); 
+            border-radius: 18px; 
+            padding: 2rem;
+            text-align: center; 
+            width: 320px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .qr-bg { 
+            background: white; 
+            padding: 1rem; 
+            border-radius: 16px; 
+            display: inline-block; 
+            margin: 1.5rem 0; 
+        }
+
+        .ticket-dashed { 
+            border-top: 2px dashed var(--border); 
+            margin: 1.5rem 0; 
+        }
+
+        /* QR Scanner Styling */
+        .scanner-container { 
+            max-width: 500px; 
+            margin: 0 auto; 
+            border-radius: 24px; 
+            overflow: hidden; 
+            border: 1px solid var(--border); 
+            position: relative; 
+        }
+
+        #qr-reader { 
+            width: 100%; 
+            background: black; 
+        }
+
+        .scan-overlay {
+            position: absolute; 
+            inset: 0; 
+            background: rgba(2,6,23,0.9); 
+            backdrop-filter: blur(8px);
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+            z-index: 10; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: opacity 0.3s;
+        }
+
+        .scan-overlay.show { 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
+
+        #overlay-icon { 
+            font-size: 4rem; 
+            margin-bottom: 1rem; 
+        }
+
+        /* ==========================================================================
+           SPECIFIC VIEW LAYOUTS & STYLES
+           ========================================================================== */
+        
+        /* Security Center */
+        .security-hero { 
+            display: grid; 
+            grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr); 
+            gap: 1.5rem; 
+            align-items: stretch; 
+        }
+
+        .security-hero .header { 
+            padding: 1rem 0 0 1rem; 
+            border-left: 3px solid var(--accent); 
+        }
+
+        .security-visual { 
+            min-height: 265px; 
+            position: relative; 
+            overflow: hidden; 
+            border-radius: 18px; 
+            box-shadow: 0 18px 35px -20px rgba(20,58,64,0.55); 
+        }
+
+        .security-visual img { 
+            width: 100%; 
+            height: 100%; 
+            min-height: 265px; 
+            object-fit: cover; 
+            display: block; 
+            filter: grayscale(1) contrast(1.12); 
+        }
+
+        .security-visual::after { 
+            content: ''; 
+            position: absolute; 
+            inset: 0; 
+            background: linear-gradient(180deg, rgba(9,11,10,0.05) 25%, rgba(9,11,10,0.94)); 
+        }
+
+        .visual-copy { 
+            position: absolute; 
+            z-index: 1; 
+            left: 1.4rem; 
+            right: 1.4rem; 
+            bottom: 1.2rem; 
+            color: #fffaf2; 
+        }
+
+        .visual-copy strong { 
+            display: block; 
+            font-size: 1.25rem; 
+            margin-bottom: 0.3rem; 
+        }
+
+        .visual-copy span { 
+            color: var(--accent); 
+            font-size: 0.8rem; 
+            font-weight: 800; 
+            letter-spacing: 0.12em; 
+            text-transform: uppercase; 
+        }
+
+        .security-hero > .card { 
+            grid-column: 1 / -1; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            border-top: 2px solid var(--accent); 
+        }
+
+        /* Generic Section Headers Layout */
+        .section-welcome { 
+            display: grid; 
+            grid-template-columns: minmax(0, 1fr) minmax(240px, 0.7fr); 
+            gap: 1.5rem; 
+            align-items: stretch; 
+            margin-bottom: 1.5rem; 
+        }
+
+        .section-welcome .header { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+        }
+
+        .welcome-kicker { 
+            color: var(--accent); 
+            font-size: 0.72rem; 
+            font-weight: 800; 
+            letter-spacing: 0.16em; 
+            text-transform: uppercase; 
+            margin-bottom: 1rem; 
+        }
+
+        .welcome-visual { 
+            min-height: 190px; 
+            position: relative; 
+            overflow: hidden; 
+            border: 1px solid var(--border); 
+            border-radius: 18px; 
+            background: #171b18; 
+        }
+
+        .welcome-visual img { 
+            width: 100%; 
+            height: 100%; 
+            min-height: 190px; 
+            object-fit: cover; 
+            display: block; 
+            filter: grayscale(1) contrast(1.15); 
+            opacity: 0.82; 
+        }
+
+        .welcome-visual::after { 
+            content: ''; 
+            position: absolute; 
+            inset: 0; 
+            background: linear-gradient(120deg, rgba(36,229,139,0.08), rgba(9,11,10,0.75)); 
+        }
+
+        .welcome-stamp { 
+            position: absolute; 
+            z-index: 1; 
+            right: 1rem; 
+            bottom: 1rem; 
+            border: 1px solid var(--accent); 
+            color: var(--accent); 
+            padding: 0.55rem 0.7rem; 
+            font-size: 0.68rem; 
+            font-weight: 800; 
+            letter-spacing: 0.1em; 
+            text-transform: uppercase; 
+            background: rgba(9,11,10,0.72); 
+        }
+
+        /* Image Mask Borders for visual flair */
+        .register-welcome, .scanner-welcome { margin-bottom: 1.5rem; }
+        .stats-welcome { margin-bottom: 1.5rem; }
+        .stats-welcome .welcome-visual { border-radius: 18px 18px 50% 18px; }
+        .register-welcome .welcome-visual { border-radius: 50% 18px 18px 18px; }
+        .scanner-welcome .welcome-visual { border-radius: 18px 50% 18px 18px; }
+
+        /* Welcome Page Styles */
+        .welcome-page { 
+            max-width: 1180px; 
+            padding: 1rem 0 3rem; 
+        }
+
+        .welcome-page .header { 
+            max-width: 900px; 
+            margin-bottom: 1.5rem; 
+        }
+
+        .welcome-page .header h1 { 
+            max-width: 900px; 
+            color: #ffffff; 
+            font-size: clamp(3.2rem, 7vw, 7rem); 
+            line-height: 0.88; 
+        }
+
+        .welcome-page .welcome-kicker { color: #e5c58f; }
+        .welcome-lead { color: #d6d6d3 !important; font-size: 1.25rem !important; max-width: 700px; line-height: 1.55; }
+        
+        .welcome-rule { 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            color: #777f79; 
+            font-size: 0.7rem; 
+            letter-spacing: 0.14em; 
+            text-transform: uppercase; 
+            margin: 2rem 0 1.25rem; 
+        }
+
+        .welcome-rule::before { 
+            content: ''; 
+            width: 48px; 
+            height: 1px; 
+            background: var(--accent); 
+        }
+
+        .welcome-stage { 
+            display: grid; 
+            grid-template-columns: minmax(0, 1fr) minmax(260px, 0.62fr); 
+            gap: 1rem; 
+            min-height: 180px; 
+        }
+
+        .welcome-stage-copy { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            padding: 1.5rem; 
+            background: #171a18; 
+            border: 1px solid var(--border); 
+            border-left: 3px solid var(--accent); 
+        }
+
+        .welcome-stage-copy strong { color: #ffffff; font-size: 1.35rem; margin-bottom: 0.45rem; }
+        .welcome-stage-copy span { color: #aeb5b0; line-height: 1.55; max-width: 600px; }
+        
+        .welcome-stage-visual { 
+            position: relative; 
+            overflow: hidden; 
+            border: 1px solid rgba(229, 197, 143, 0.45); 
+            background: #181b19; 
+        }
+
+        .welcome-stage-visual img { 
+            width: 100%; 
+            height: 100%; 
+            min-height: 180px; 
+            display: block; 
+            object-fit: cover; 
+            filter: grayscale(1) contrast(1.2); 
+            opacity: 0.78; 
+        }
+
+        .welcome-stage-visual::after { 
+            content: ''; 
+            position: absolute; 
+            inset: 0; 
+            background: linear-gradient(135deg, rgba(36,229,139,0.14), rgba(9,11,10,0.7)); 
+        }
+
+        .stage-index { 
+            position: absolute; 
+            z-index: 1; 
+            right: 1rem; 
+            top: 1rem; 
+            color: #e5c58f; 
+            font-size: 0.7rem; 
+            letter-spacing: 0.12em; 
+        }
+
+        /* Stickers and Badges */
+        .section-sticker { 
+            position: absolute; 
+            z-index: 2; 
+            top: 1rem; 
+            left: 1rem; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 0.4rem; 
+            padding: 0.55rem 0.7rem; 
+            color: #080b09; 
+            background: #ffffff; 
+            border: 2px solid #080b09; 
+            border-radius: 4px 12px 4px 12px; 
+            font-size: 0.68rem; 
+            font-weight: 900; 
+            letter-spacing: 0.08em; 
+            text-transform: uppercase; 
+            transform: rotate(-4deg); 
+            box-shadow: 4px 4px 0 rgba(36, 229, 139, 0.9); 
+        }
+
+        .section-sticker::before { 
+            content: ''; 
+            width: 7px; 
+            height: 7px; 
+            border-radius: 50%; 
+            background: var(--accent); 
+        }
+
+        .section-sticker.champagne { background: #e5c58f; box-shadow: 4px 4px 0 #ffffff; }
+        .section-sticker.dark { color: #ffffff; background: #202522; border-color: #ffffff; box-shadow: 4px 4px 0 var(--accent); }
+        .welcome-page .section-sticker { position: relative; top: auto; left: auto; transform: rotate(3deg); margin-left: auto; align-self: flex-start; }
+        .welcome-stage-visual .section-sticker { position: absolute; top: 1rem; left: 1rem; }
+        .section-tagline { display: inline-block; margin-top: 0.3rem; color: #e5c58f; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.11em; text-transform: uppercase; }
+        
+        /* Grid Layouts for Features/Stats */
+        .welcome-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); 
+            gap: 1rem; 
+        }
+
+        .welcome-card { 
+            min-height: 220px; 
+            position: relative; 
+            overflow: hidden; 
+            background: #202321; 
+            border: 1px solid rgba(255, 255, 255, 0.17); 
+            box-shadow: 0 22px 45px -28px #000; 
+        }
+
+        .welcome-card::after { 
+            content: ''; 
+            position: absolute; 
+            width: 90px; 
+            height: 90px; 
+            right: -28px; 
+            top: -28px; 
+            border: 1px solid rgba(229, 197, 143, 0.5); 
+            border-radius: 50%; 
+        }
+
+        .welcome-card[role="button"] { cursor: pointer; }
+        .welcome-card[role="button"]:focus-visible { outline: 2px solid #e5c58f; outline-offset: 4px; }
+        .welcome-card:hover { border-color: #e5c58f; transform: translateY(-5px); }
+        .welcome-card b { color: #e5c58f; font-size: 2.4rem; line-height: 1; display: block; margin-bottom: 2rem; }
+        .welcome-card h3 { color: #ffffff; margin-bottom: 0.6rem; }
+        .welcome-card p { color: #b8bcb9; line-height: 1.55; }
+        .welcome-card:first-child { border-top: 3px solid #ffffff; }
+        .welcome-card:nth-child(2) { border-top: 3px solid #e5c58f; }
+        .welcome-card:nth-child(3) { border-top: 3px solid #a9aaa7; }
+        .welcome-card:nth-child(4) { border-top: 3px solid #e5c58f; }
+
+        /* Support Page Specific Layout */
+        .support-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr); gap: 1.5rem; align-items: stretch; }
+        .support-card { display: flex; flex-direction: column; justify-content: center; }
+        .support-link { display: block; color: var(--text-main); text-decoration: none; border: 1px solid var(--border); padding: 1.1rem 1.25rem; border-radius: 10px; margin-top: 1rem; transition: border-color 0.3s, background 0.3s, transform 0.3s; }
+        .support-link:hover { border-color: var(--accent); background: var(--accent-soft); transform: translateX(4px); }
+        .support-link small { display: block; color: var(--accent); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.35rem; }
+        .support-visual { min-height: 330px; }
+        .support-visual img { width: 100%; height: 100%; min-height: 330px; object-fit: cover; filter: grayscale(1) contrast(1.15); }
+        .support-status { display: inline-flex; align-items: center; gap: 0.55rem; color: #d7ddd9; font-size: 0.78rem; margin-bottom: 1.25rem; }
+        .support-status::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+        .support-faq { margin-top: 1.5rem; }
+        .support-faq-title { color: var(--text-main); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 0.8rem; }
+        .support-faq-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; }
+        .support-faq-item { padding: 1rem; background: #171a18; border: 1px solid var(--border); border-radius: 10px; }
+        .support-faq-item strong { display: block; color: #fff; font-size: 0.9rem; margin-bottom: 0.4rem; }
+        .support-faq-item span { color: var(--text-muted); font-size: 0.78rem; line-height: 1.45; }
+
+        /* Form Layouts & Utilities */
+        .workflow-note { display: flex; align-items: center; gap: 0.7rem; color: #bbc3be; font-size: 0.78rem; margin-bottom: 1.2rem; }
+        .workflow-note::before { content: '✓'; display: grid; place-items: center; width: 21px; height: 21px; color: #07130d; background: var(--accent); border-radius: 50%; font-weight: 900; }
+        .security-form-layout, .register-form-layout { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 1.5rem; align-items: center; }
+        .field-label { display: block; color: #e8ece9; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 0.5rem; }
+        .form-tip { padding: 1.25rem; background: #191d1a; border: 1px solid var(--border); border-left: 2px solid #e5c58f; }
+        .form-tip strong { display: block; color: #fff; margin-bottom: 0.55rem; }
+        .form-tip p { color: var(--text-muted); font-size: 0.82rem; line-height: 1.55; }
+        .register-form-layout { grid-template-columns: minmax(0, 1fr) 280px; }
+        .register-form-layout .form-tip { align-self: stretch; display: flex; flex-direction: column; justify-content: center; }
+        .register-form-layout .form-tip strong { color: #e5c58f; font-size: 1.1rem; }
+        .form-tip-list { list-style: none; margin-top: 1rem; color: #b8c0ba; font-size: 0.78rem; line-height: 2; }
+        .form-tip-list li::before { content: '•'; color: var(--accent); margin-right: 0.55rem; }
+        
+        /* Stats View Adjustments */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 1.5rem; }
+        .stat-card { min-height: 170px; padding: 1.5rem; background: #171a18; border: 1px solid var(--border); border-top: 3px solid #ffffff; }
+        .stat-card:nth-child(2) { border-top-color: var(--accent); }
+        .stat-card:nth-child(3) { border-top-color: #e5c58f; }
+        .stat-label { color: #aeb5b0; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
+        .stat-number { display: block; color: #ffffff; font-size: clamp(2.7rem, 6vw, 5rem); line-height: 1; margin: 1.25rem 0 0.55rem; }
+        .stat-card:nth-child(2) .stat-number { color: var(--accent); }
+        .stat-card:nth-child(3) .stat-number { color: #e5c58f; }
+        .stats-meta { display: flex; justify-content: space-between; gap: 1rem; color: var(--text-muted); font-size: 0.8rem; margin-top: 1.5rem; }
+        .stats-refresh { color: var(--accent); cursor: pointer; background: transparent; border: 0; font: inherit; font-weight: 800; }
+        .stats-refresh:hover { color: var(--accent-hover); }
+
+        /* ==========================================================================
+           RESPONSIVE DESIGN (Mobile & Tablet Layouts)
+           ========================================================================== */
+        @media (max-width: 760px) {
+            body { height: auto; min-height: 100vh; overflow: auto; flex-direction: column; }
+            .sidebar { width: 100%; padding: 1rem; border-right: none; border-bottom: 1px solid var(--border); }
+            .logo { margin-bottom: 1rem; }
+            .nav-btn { display: inline-flex; width: auto; padding: 0.7rem 0.8rem; margin: 0 0.25rem 0 0; font-size: 0.85rem; }
+            .main-content { padding: 2rem 1rem; }
+            .main-content::before { left: 1rem; right: 1rem; }
+            .header h1 { font-size: 2rem; }
+            .card { padding: 1.25rem; }
+            
+            form[onsubmit="checkBreach(event)"] { flex-direction: column; }
+            .security-hero { grid-template-columns: 1fr; }
+            .security-visual { min-height: 210px; }
+            .security-visual img { min-height: 210px; }
+            .section-welcome { grid-template-columns: 1fr; }
+            .welcome-visual, .welcome-visual img { min-height: 165px; }
+            
+            .welcome-grid, .support-layout { grid-template-columns: 1fr; }
+            .welcome-page { padding-top: 0; }
+            .welcome-stage { grid-template-columns: 1fr; }
+            .welcome-stage-visual, .welcome-stage-visual img { min-height: 150px; }
+            
+            .support-visual, .support-visual img { min-height: 220px; }
+            .support-faq-grid { grid-template-columns: 1fr; }
+            
+            .security-form-layout, .register-form-layout { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .stats-meta { align-items: flex-start; flex-direction: column; }
+        }
+
+        @media (min-width: 761px) and (max-width: 1050px) {
+            .welcome-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- =======================================================================
+         SIDEBAR / NAVIGATION MENU
+         ======================================================================= -->
+    <aside class="sidebar">
+        <div class="logo">EVENT<span>GUARD</span></div>
+        <button class="nav-btn active" onclick="switchTab('welcome')"><b>•</b> Welcome</button>
+        <button class="nav-btn" onclick="switchTab('security')"><b>•</b> Security Check</button>
+        <button class="nav-btn" onclick="switchTab('register')"><b>•</b> Register Attendee</button>
+        <button class="nav-btn" onclick="switchTab('scanner')"><b>•</b> Live QR Scanner</button>
+        <button class="nav-btn" onclick="switchTab('stats')"><b>•</b> Event Statistics</button>
+        <button class="nav-btn" onclick="switchTab('support')"><b>•</b> Help &amp; Support</button>
+        
+        <div class="sidebar-note">
+            <strong>Control room online</strong>
+            Technova 2026<br>
+            Secure event operations
+        </div>
+    </aside>
+
+    <!-- =======================================================================
+         MAIN CONTENT & VIEWS
+         ======================================================================= -->
+    <main class="main-content">
+
+        <!-- 0. WELCOME DASHBOARD -->
+        <div id="welcome" class="view active welcome-page">
+            <div class="header">
+                <div class="section-sticker">Event ready</div>
+                <div class="welcome-kicker">Welcome to EventGuard / your event safety console</div>
+                <h1>Make every arrival feel effortless.</h1>
+                <p class="welcome-lead">
+                    EventGuard helps event teams protect attendee information, issue secure digital passes, 
+                    and verify guests at the door with one calm, connected workspace.
+                </p>
+            </div>
+            
+            <div class="welcome-rule">One console. Three moments that matter.</div>
+            
+            <div class="welcome-stage">
+                <div class="welcome-stage-copy">
+                    <strong>Built for the moment before the doors open.</strong>
+                    <span>From the first identity check to the final scan, keep your guest journey clear, secure, and beautifully organized.</span>
+                </div>
+                <div class="welcome-stage-visual">
+                    <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1000&q=85" alt="People arriving at a lively event venue">
+                    <span class="section-sticker champagne">Live atmosphere</span>
+                    <span class="stage-index">LIVE / 2026</span>
+                </div>
+            </div>
+            
+            <div class="welcome-rule">Choose your next move</div>
+            
+            <div class="welcome-grid">
+                <div class="card welcome-card" role="button" tabindex="0" onclick="switchTab('security')" onkeydown="navigateFromWelcome(event, 'security')">
+                    <b>•</b>
+                    <h3>Protect identities</h3>
+                    <p>Check an email against known breach records before an attendee enters your event system.</p>
+                </div>
+                <div class="card welcome-card" role="button" tabindex="0" onclick="switchTab('register')" onkeydown="navigateFromWelcome(event, 'register')">
+                    <b>•</b>
+                    <h3>Issue a pass</h3>
+                    <p>Register guests and create a unique QR ticket they can keep on their phone.</p>
+                </div>
+                <div class="card welcome-card" role="button" tabindex="0" onclick="switchTab('scanner')" onkeydown="navigateFromWelcome(event, 'scanner')">
+                    <b>•</b>
+                    <h3>Welcome them in</h3>
+                    <p>Scan each pass at the entrance and instantly confirm who has arrived.</p>
+                </div>
+                <div class="card welcome-card" role="button" tabindex="0" onclick="switchTab('stats')" onkeydown="navigateFromWelcome(event, 'stats')">
+                    <b>•</b>
+                    <h3>Track attendance</h3>
+                    <p>View tickets sold, participants inside, and ticketed guests who have not arrived.</p>
+                </div>
+                <div class="card welcome-card" role="button" tabindex="0" onclick="switchTab('support')" onkeydown="navigateFromWelcome(event, 'support')">
+                    <b>•</b>
+                    <h3>Get support</h3>
+                    <p>Reach the Help &amp; Support desk whenever you need assistance with your event.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 1. SECURITY BREACH CHECKER -->
+        <div id="security" class="view">
+            <div class="security-hero">
+                <div class="header">
+                    <div class="welcome-kicker">Welcome to the safety desk</div>
+                    <h1>Is your email exposed?</h1>
+                    <p>Check whether your email address has appeared in known data breaches.</p>
+                </div>
+                <div class="security-visual">
+                    <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?auto=format&fit=crop&w=900&q=85" alt="Laptop showing a secure digital lock">
+                    <span class="section-sticker dark">Identity first</span>
+                    <div class="visual-copy">
+                        <span>EventGuard / 2026</span>
+                        <strong>Good energy. Safer arrivals.</strong>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="security-form-layout">
+                        <div>
+                            <div class="workflow-note">Private lookup. No password required.</div>
+                            <form onsubmit="checkBreach(event)" novalidate style="display: flex; gap: 1rem;">
+                                <div style="flex: 1;">
+                                    <label class="field-label" for="breach-email">Email address</label>
+                                    <input type="email" id="breach-email" placeholder="name@example.com" required oninvalid="showInvalidEmail(event)" style="margin-bottom: 0;">
+                                </div>
+                                <button type="submit" class="btn" id="breach-btn" style="align-self: end;">Check Exposure</button>
+                            </form>
+                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 1rem;">
+                                Try "test@breached.com" to preview the breach result.
+                            </p>
+                        </div>
+                        <div class="form-tip">
+                            <strong>Why check first?</strong>
+                            <p>Know if an address has appeared in a known breach before you store it in your event records.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Where API breach results are displayed -->
+            <div id="breach-results" style="margin-top: 2rem;"></div>
+        </div>
+
+        <!-- 2. ATTENDEE REGISTRATION & TICKETING -->
+        <div id="register" class="view">
+            <div class="section-welcome register-welcome">
+                <div class="header">
+                    <div class="welcome-kicker">Welcome, host</div>
+                    <h1>Issue Digital Pass</h1>
+                    <p>Register an attendee and securely generate their unique QR ticket.</p>
+                </div>
+                <div class="welcome-visual">
+                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=900&q=85" alt="Hand holding a digital access card">
+                    <span class="section-sticker champagne">Guest list ready</span>
+                    <div class="welcome-stamp">Make an entrance</div>
+                </div>
+            </div>
+            
+            <!-- Registration Form -->
+            <div class="card" id="reg-form-card">
+                <div class="register-form-layout">
+                    <form onsubmit="registerAttendee(event)">
+                        <div class="workflow-note">A unique pass is generated instantly.</div>
+                        <label class="field-label" for="reg-name">Attendee name</label>
+                        <input type="text" id="reg-name" placeholder="Full Name" required>
+                        <label class="field-label" for="reg-email">Attendee email</label>
+                        <input type="email" id="reg-email" placeholder="Email Address" required>
+                        <button type="submit" class="btn" style="width: 100%;">Generate Secure Pass</button>
+                    </form>
+                    <div class="form-tip">
+                        <strong>Ready for the guest list?</strong>
+                        <p>Each attendee receives a unique QR pass that can be verified at the entrance.</p>
+                        <ul class="form-tip-list">
+                            <li>Fast registration</li>
+                            <li>Unique QR identity</li>
+                            <li>Easy entrance check-in</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Displayed Generated Ticket -->
+            <div class="ticket-wrapper" id="ticket-container" style="display: none;">
+                <div class="digital-ticket">
+                    <h3 style="color: var(--accent); letter-spacing: 2px; font-size: 0.9rem;">TECHNOVA 2026</h3>
+                    <div class="qr-bg" id="qrcode"></div>
+                    <h2 id="ticket-name" style="margin-bottom: 0.2rem;"></h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">VIP Attendee</p>
+                    <div class="ticket-dashed"></div>
+                    <button class="btn" style="width: 100%; background: #334155;" onclick="resetRegistration()">Register Another</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. ENTRANCE QR SCANNER -->
+        <div id="scanner" class="view">
+            <div class="section-welcome scanner-welcome">
+                <div class="header">
+                    <div class="welcome-kicker">Welcome to the door</div>
+                    <h1>Entrance Scanner</h1>
+                    <p>Scan attendee passes to verify and record check-ins securely.</p>
+                </div>
+                <div class="welcome-visual">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=900&q=85" alt="Person using a laptop to verify an entry">
+                    <span class="section-sticker dark">Door mode</span>
+                    <div class="welcome-stamp">Scan. Confirm. Welcome.</div>
+                </div>
+            </div>
+            
+            <!-- Scanner Viewport & Overlay -->
+            <div class="scanner-container">
+                <div id="qr-reader"></div>
+                <div class="scan-overlay" id="scan-overlay">
+                    <div id="overlay-icon">✅</div>
+                    <h2 id="overlay-title">SUCCESS</h2>
+                    <p id="overlay-sub" style="color: var(--text-muted); margin-top: 0.5rem;"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. LIVE EVENT STATISTICS -->
+        <div id="stats" class="view">
+            <div class="section-welcome stats-welcome">
+                <div class="header">
+                    <div class="welcome-kicker">Welcome to the control board</div>
+                    <h1>Know your numbers.</h1>
+                    <p>See ticket demand and arrival progress at a glance while your event is in motion.</p>
+                </div>
+                <div class="welcome-visual">
+                    <img src="https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=900&q=85" alt="Audience viewing an event presentation">
+                    <span class="section-sticker">Live overview</span>
+                    <div class="welcome-stamp">Numbers in motion</div>
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="card stat-card">
+                    <span class="stat-label">Tickets sold</span>
+                    <strong class="stat-number" id="tickets-sold">0</strong>
+                    <span class="stat-label">Issued passes</span>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-label">Participants entered</span>
+                    <strong class="stat-number" id="participants-entered">0</strong>
+                    <span class="stat-label">Confirmed check-ins</span>
+                </div>
+                <div class="card stat-card">
+                    <span class="stat-label">Not present</span>
+                    <strong class="stat-number" id="participants-absent">0</strong>
+                    <span class="stat-label">Ticketed, not checked in</span>
+                </div>
+            </div>
+            
+            <div class="card stats-meta">
+                <span id="stats-updated">Live count from this browser</span>
+                <button class="stats-refresh" type="button" onclick="updateEventStats()">Refresh numbers</button>
+            </div>
+        </div>
+
+        <!-- 5. HELP & SUPPORT -->
+        <div id="support" class="view">
+            <div class="support-layout">
+                <div class="header support-card">
+                    <div class="welcome-kicker">Welcome to the help desk</div>
+                    <div class="support-status">Support desk available</div>
+                    <h1>We have your back.</h1>
+                    <p>Keep your event moving with practical help for registrations, digital passes, security checks, and entrance scanning.</p>
+                    
+                    <a class="support-link" href="tel:7977547103">
+                        <small>Primary phone</small>7977547103
+                    </a>
+                    <a class="support-link" href="tel:8091287945">
+                        <small>Secondary phone</small>8091287945
+                    </a>
+                    <a class="support-link" href="mailto:siddhivinayakmishra07@gmail.com">
+                        <small>Primary email</small>siddhivinayakmishra07@gmail.com
+                    </a>
+                    <a class="support-link" href="mailto:mehaks22116@gmail.com">
+                        <small>Secondary email</small>mehaks22116@gmail.com
+                    </a>
+                    
+                    <div class="support-faq">
+                        <div class="support-faq-title">Quick answers</div>
+                        <div class="support-faq-grid">
+                            <div class="support-faq-item">
+                                <strong>Pass not showing?</strong>
+                                <span>Check your attendee details and generate the pass again.</span>
+                            </div>
+                            <div class="support-faq-item">
+                                <strong>QR not accepted?</strong>
+                                <span>Use the exact QR created by EventGuard and check the connection.</span>
+                            </div>
+                            <div class="support-faq-item">
+                                <strong>Email check issue?</strong>
+                                <span>Confirm the address is complete, then try the security check again.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="welcome-visual support-visual">
+                    <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=85" alt="Support team collaborating together">
+                    <span class="section-sticker champagne">Human help</span>
+                    <div class="welcome-stamp">People behind the pass</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- =======================================================================
+         JAVASCRIPT LOGIC
+         ======================================================================= -->
+    <script>
+        // --- 0. UI NAVIGATION UTILITIES ---
+        
+        // Allows keyboard users to hit "Enter" on welcome page cards
+        function navigateFromWelcome(e, tabId) {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                switchTab(tabId);
+            }
+        }
+
+        // Handles view transitions and button states
+        function switchTab(tabId) {
+            // Hide all views and deactivate buttons
+            document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            
+            // Show the selected view and activate its button
+            document.getElementById(tabId).classList.add('active');
+            document.querySelector(`.nav-btn[onclick="switchTab('${tabId}')"]`).classList.add('active');
+
+            // View-specific lifecycle hooks
+            if (tabId === 'scanner') {
+                initScanner();
+            } else {
+                // Pause the camera if we leave the scanner view to save battery
+                if (html5QrcodeScanner) html5QrcodeScanner.pause();
+                
+                // Refresh statistics when visiting the stats tab
+                if (tabId === 'stats') updateEventStats();
+            }
+        }
+
+        // --- 1. SECURITY BREACH CHECKER LOGIC ---
+        
+        // Native HTML5 validation error handler
+        function showInvalidEmail(e) {
+            e.preventDefault();
+            const resultsContainer = document.getElementById('breach-results');
+            resultsContainer.innerHTML = `
+                <div class="card status-banner status-danger">
+                    <h3 style="color: var(--danger); margin-bottom: 0.5rem;">Enter a valid email address</h3>
+                    <p style="color: var(--text-muted);">Please use a format like name@example.com.</p>
+                </div>
+            `;
+        }
+
+        // Handle the API check for compromised emails
+        async function checkBreach(e) {
+            e.preventDefault();
+            
+            const btn = document.getElementById('breach-btn');
+            const results = document.getElementById('breach-results');
+            const emailInput = document.getElementById('breach-email');
+            const email = emailInput.value.trim();
+
+            // Validate before sending
+            if (!emailInput.checkValidity()) {
+                results.innerHTML = `
+                    <div class="card status-banner status-danger">
+                        <h3 style="color: var(--danger); margin-bottom: 0.5rem;">Enter a valid email address</h3>
+                        <p style="color: var(--text-muted);">Please use a format like name@example.com.</p>
+                    </div>
+                `;
+                emailInput.focus();
+                return;
+            }
+
+            btn.innerText = "Checking...";
+            
+            try {
+                // Attempt connection to our C-backend API
+                const res = await fetch('/api/security/check', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                
+                const data = await res.json();
+                if (!res.ok || !Array.isArray(data.breaches)) {
+                    throw new Error(data.error || 'Invalid security response');
+                }
+                
+                // Render Secure (No breaches)
+                if (data.breaches.length === 0) {
+                    results.innerHTML = `
+                        <div class="card status-banner">
+                            <h3 style="color: var(--success); margin-bottom: 0.5rem;">No known breaches found</h3>
+                            <p style="color: var(--text-muted)">Your email looks safe. Continue using unique passwords and 2FA.</p>
+                        </div>
+                    `;
+                } 
+                // Render Breached data
+                else {
+                    let html = `
+                        <div class="card status-banner status-danger">
+                            <h3 style="color: var(--danger); margin-bottom: 1rem;">Found in ${data.breaches.length} breaches</h3>
+                    `;
+                    
+                    data.breaches.forEach(breach => {
+                        html += `
+                            <div style="margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+                                <h4>${breach.Name} <span style="color: var(--text-muted); font-weight: normal; font-size: 0.9rem;">- ${breach.BreachDate}</span></h4>
+                                <p style="color: var(--danger); font-size: 0.85rem; margin-top: 0.3rem;">Exposed: ${breach.DataClasses.join(', ')}</p>
+                            </div>
+                        `;
+                    });
+
+                    html += `
+                            <h4 style="margin-top: 1.5rem; margin-bottom: 1rem;">Recommended Actions:</h4>
+                            <ul style="color: var(--text-muted); padding-left: 1.5rem; line-height: 1.8;">
+                                <li>Change passwords for the affected services immediately.</li>
+                                <li>Ensure you are not reusing those passwords elsewhere.</li>
+                                <li>Enable Two-Factor Authentication (2FA) on critical accounts.</li>
+                            </ul>
+                        </div>
+                    `;
+                    results.innerHTML = html;
+                }
+            } catch (err) {
+                // FALLBACK: Keep the UI demo functional even if the C-server isn't running.
+                const isMockBreach = email.toLowerCase().includes('breached');
+                
+                if (isMockBreach) {
+                    results.innerHTML = `
+                        <div class="card status-banner status-danger">
+                            <h3 style="color: var(--danger); margin-bottom: 1rem;">Found in 2 breaches</h3>
+                            <p style="color: var(--text-muted);">Canva (2019-05-24) and LinkedIn (2012-05-05)</p>
+                            <p style="color: var(--danger); font-size: 0.85rem; margin-top: 0.5rem;">Exposed: Email addresses, Passwords</p>
+                        </div>
+                    `;
+                } else {
+                    results.innerHTML = `
+                        <div class="card status-banner">
+                            <h3 style="color: var(--success); margin-bottom: 0.5rem;">No known breaches found</h3>
+                            <p style="color: var(--text-muted)">Your email looks safe. Continue using unique passwords and 2FA.</p>
+                            <p style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.75rem;">Offline demo result</p>
+                        </div>
+                    `;
+                }
+            }
+            btn.innerText = "Check Exposure";
+        }
+
+        // --- 2. LOCAL STORAGE HELPERS (For offline demo persistence) ---
+        const localAttendeesKey = 'eventguard-attendees';
+
+        function saveLocalAttendee(attendee) {
+            const attendees = JSON.parse(localStorage.getItem(localAttendeesKey) || '{}');
+            attendees[attendee.token] = attendee;
+            localStorage.setItem(localAttendeesKey, JSON.stringify(attendees));
+        }
+
+        function getLocalAttendee(token) {
+            const attendees = JSON.parse(localStorage.getItem(localAttendeesKey) || '{}');
+            return attendees[token];
+        }
+
+        function saveLocalCheckin(token) {
+            const checkins = JSON.parse(localStorage.getItem('eventguard-checkins') || '{}');
+            checkins[token] = checkins[token] || new Date().toISOString();
+            localStorage.setItem('eventguard-checkins', JSON.stringify(checkins));
+        }
+
+        // Refreshes the Statistics Dashboard data
+        function updateEventStats() {
+            const attendees = JSON.parse(localStorage.getItem(localAttendeesKey) || '{}');
+            const checkins = JSON.parse(localStorage.getItem('eventguard-checkins') || '{}');
+            
+            const ticketsSold = Object.keys(attendees).length;
+            const participantsEntered = Object.keys(checkins).filter(token => attendees[token]).length;
+            
+            document.getElementById('tickets-sold').innerText = ticketsSold;
+            document.getElementById('participants-entered').innerText = participantsEntered;
+            document.getElementById('participants-absent').innerText = Math.max(0, ticketsSold - participantsEntered);
+            document.getElementById('stats-updated').innerText = `Updated ${new Date().toLocaleTimeString()} | Live count from this browser`;
+        }
+
+        // --- 3. ATTENDEE REGISTRATION & QR GENERATION ---
+        async function registerAttendee(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            let data;
+            
+            try {
+                // Attempt to register with the backend
+                const res = await fetch('/api/events/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email })
+                });
+                data = await res.json();
+                
+                if (!res.ok || data.status !== 'success') {
+                    throw new Error(data.error || 'Registration failed');
+                }
+            } catch (err) {
+                // FALLBACK: Generate a displayable demo pass if the C server is offline.
+                data = {
+                    status: 'success',
+                    token: crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                    name: name,
+                    email: email
+                };
+            }
+
+            if (data.status === 'success') {
+                // Save locally to support the offline demo workflow
+                saveLocalAttendee({ 
+                    token: data.token, 
+                    name: data.name, 
+                    email: data.email || email 
+                });
+                updateEventStats();
+                
+                // Swap view from form to ticket
+                document.getElementById('reg-form-card').style.display = 'none';
+                document.getElementById('ticket-container').style.display = 'flex';
+                document.getElementById('ticket-name').innerText = data.name;
+                
+                // Render the physical QR code graphic
+                const qrContainer = document.getElementById('qrcode');
+                qrContainer.innerHTML = ""; // Clear previous QR
+                
+                if (typeof QRCode === 'function') {
+                    new QRCode(qrContainer, {
+                        text: data.token, 
+                        width: 160, 
+                        height: 160,
+                        colorDark: "#0f172a", 
+                        colorLight: "#ffffff", 
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                } else {
+                    // Failsafe if library failed to load
+                    qrContainer.innerHTML = `
+                        <strong style="color: #0f172a;">Pass code</strong><br>
+                        <small style="color: #0f172a; word-break: break-all;">${data.token}</small>
+                    `;
+                }
+            }
+        }
+
+        // Resets the registration view for the next attendee
+        function resetRegistration() {
+            document.getElementById('reg-form-card').style.display = 'block';
+            document.getElementById('ticket-container').style.display = 'none';
+            document.getElementById('reg-name').value = '';
+            document.getElementById('reg-email').value = '';
+        }
+
+        // --- 4. ENTRANCE QR SCANNER & CHECK-IN ---
+        let html5QrcodeScanner = null;
+        let isScanning = false;
+
+        // Bootstraps the camera functionality
+        function initScanner() {
+            if (html5QrcodeScanner) { 
+                html5QrcodeScanner.resume(); 
+                return; 
+            }
+            
+            html5QrcodeScanner = new Html5Qrcode("qr-reader");
+            html5QrcodeScanner.start(
+                { facingMode: "environment" }, 
+                { fps: 10, qrbox: { width: 250, height: 250 } }, 
+                onScanSuccess, 
+                () => {} // Ignored error callback for continuous scanning
+            );
+        }
+
+        // Callback fired when a QR is successfully read by the camera
+        async function onScanSuccess(decodedText) {
+            // Prevent multiple rapid fires
+            if (isScanning) return;
+            isScanning = true;
+            html5QrcodeScanner.pause();
+
+            try {
+                // Ping the backend to record check-in
+                const res = await fetch('/api/events/checkin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token: decodedText })
+                });
+                
+                const data = await res.json();
+                const localAttendee = getLocalAttendee(decodedText);
+                const attendeeDetails = localAttendee ? `${data.attendee.name} | ${localAttendee.email}` : data.attendee.name;
+                
+                if (res.status === 200) { 
+                    saveLocalCheckin(decodedText); 
+                    updateEventStats(); 
+                    showOverlay("✅", "CHECK-IN SUCCESS", attendeeDetails, "var(--success)"); 
+                } 
+                else if (res.status === 409) { 
+                    saveLocalCheckin(decodedText); 
+                    updateEventStats(); 
+                    showOverlay("⚠️", "ALREADY CHECKED IN", attendeeDetails, "var(--warning)"); 
+                } 
+                else if (localAttendee) {
+                    // Fallback to local logic if server doesn't know them but local does
+                    showLocalCheckIn(localAttendee);
+                } 
+                else {
+                    showOverlay("❌", "INVALID PASS", "Code not recognized", "var(--danger)");
+                }
+            } catch (err) {
+                // FALLBACK: If server is down, use local browser storage to simulate the flow
+                const localAttendee = getLocalAttendee(decodedText);
+                if (localAttendee) {
+                    showLocalCheckIn(localAttendee);
+                } else {
+                    showOverlay("❌", "INVALID QR", "Please provide a valid QR code", "var(--danger)");
+                }
+            }
+        }
+
+        // Fallback offline handler for check-ins
+        function showLocalCheckIn(attendee) {
+            const attendees = JSON.parse(localStorage.getItem('eventguard-checkins') || '{}');
+            
+            // Check if already in the local "database"
+            if (attendees[attendee.token]) {
+                showOverlay("⚠️", "ALREADY CHECKED IN", `${attendee.name} | ${attendee.email}`, "var(--warning)");
+                return;
+            }
+            
+            // Record new local check-in
+            attendees[attendee.token] = new Date().toISOString();
+            localStorage.setItem('eventguard-checkins', JSON.stringify(attendees));
+            updateEventStats();
+            
+            showOverlay("✅", "CHECK-IN SUCCESS", `${attendee.name} | ${attendee.email}`, "var(--success)");
+        }
+
+        // Displays the large visual overlay over the camera viewport
+        function showOverlay(icon, title, subText, color) {
+            const overlay = document.getElementById('scan-overlay');
+            
+            document.getElementById('overlay-icon').innerText = icon;
+            document.getElementById('overlay-title').innerText = title;
+            document.getElementById('overlay-title').style.color = color;
+            document.getElementById('overlay-sub').innerText = subText;
+            
+            overlay.classList.add('show');
+            
+            // Auto-dismiss and resume camera after 3 seconds
+            setTimeout(() => {
+                overlay.classList.remove('show');
+                isScanning = false;
+                html5QrcodeScanner.resume();
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
